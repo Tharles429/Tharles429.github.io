@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relógio Full HD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            color: white;
+            perspective: 1000px;
+        }
+        
+        .container {
+            width: 1920px;
+            height: 1080px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .clock-container {
+            position: relative;
+            padding: 40px;
+            border-radius: 30px;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateZ(50px);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .clock {
+            font-size: 12rem;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+            letter-spacing: 5px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .colon {
+            animation: pulse 2s infinite;
+        }
+        
+        .date-container {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 300;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            opacity: 0.9;
+        }
+        
+        .weekday {
+            margin-top: 15px;
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .bottom-bar {
+            position: absolute;
+            bottom: 60px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            font-size: 1.8rem;
+            opacity: 0.7;
+        }
+        
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+            animation: fall linear infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateZ(50px); }
+            50% { transform: translateY(-20px) translateZ(50px); }
+        }
+        
+        @keyframes fall {
+            to { transform: translateY(1080px) rotate(360deg); }
+        }
+        
+        /* Responsividade para telas menores */
+        @media (max-width: 1920px) {
+            .container {
+                transform: scale(0.8);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="clock-container">
+            <div class="clock" id="clock">
+                <span id="hours">00</span>
+                <span class="colon">:</span>
+                <span id="minutes">00</span>
+                <span class="colon">:</span>
+                <span id="seconds">00</span>
+            </div>
+            <div class="date-container">
+                <div id="date">1 de Janeiro de 2023</div>
+                <div class="weekday" id="weekday">Domingo</div>
+            </div>
+        </div>
+        
+        <div class="bottom-bar">
+            <div>Relógio Full HD</div>
+            <div id="timezone">Fuso Horário: GMT-3</div>
+        </div>
+    </div>
+
+    <script>
+        // Função para atualizar o relógio
+        function updateClock() {
+            const now = new Date();
+            
+            // Obter horas, minutos e segundos
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            
+            // Atualizar elementos do relógio
+            document.getElementById('hours').textContent = hours;
+            document.getElementById('minutes').textContent = minutes;
+            document.getElementById('seconds').textContent = seconds;
+            
+            // Obter e formatar a data
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            const date = now.toLocaleDateString('pt-BR', options);
+            document.getElementById('date').textContent = date;
+            
+            // Obter dia da semana
+            const weekdays = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+            const weekday = weekdays[now.getDay()];
+            document.getElementById('weekday').textContent = weekday;
+            
+            // Atualizar fuso horário
+            const timezoneOffset = -now.getTimezoneOffset() / 60;
+            const timezoneString = `Fuso Horário: GMT${timezoneOffset >= 0 ? '+' : ''}${timezoneOffset}`;
+            document.getElementById('timezone').textContent = timezoneString;
+        }
+        
+        // Criar partículas de fundo
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 100;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Posição aleatória
+                const left = Math.random() * 100;
+                const top = Math.random() * -100;
+                particle.style.left = `${left}%`;
+                particle.style.top = `${top}px`;
+                
+                // Tamanho aleatório
+                const size = Math.random() * 3 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Duração da animação aleatória
+                const duration = Math.random() * 10 + 5;
+                particle.style.animationDuration = `${duration}s`;
+                
+                // Atraso aleatório
+                const delay = Math.random() * 5;
+                particle.style.animationDelay = `${delay}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Inicializar
+        updateClock();
+        setInterval(updateClock, 1000);
+        createParticles();
+    </script>
+</body>
+</html>
